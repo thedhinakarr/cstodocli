@@ -8,22 +8,23 @@ const server = http.createServer(async (req, res) => {
     console.log(`Request received for ${req.url} from ${req.socket.remoteAddress}`);
     res.setHeader('Content-Type', 'application/json');
     if (req.method === 'GET') {
+
       const data = await fs.readFile("data.json");
       res.statusCode = 200;
       res.end(data);
     } else if (req.method === 'POST') {
-      let body = '';
-      req.on("data", (chunk) => {
-        body += chunk;
-      });
-      req.on("end", async () => {
-        res.statusCode = 200;
-        res.end(JSON.stringify({ message: "Data Received Successfully" }));
-        let data = await fs.readFile("data.json");
-        data = JSON.parse(data);
-        data.cities.push(JSON.parse(body));
-        await fs.writeFile("data.json", JSON.stringify(data));
-      });
+      if (req.url === '/data') {
+        let body = '';
+        req.on("data", (chunk) => {
+          body += chunk;
+        });
+        req.on("end", async () => {
+          body = JSON.parse(body);
+          res.statusCode = 200;
+          res.end(JSON.stringify({ message: `Received data for ${body.name} who is ${body.age} years old.` }));
+        });
+
+      }
     }
 
     else {
