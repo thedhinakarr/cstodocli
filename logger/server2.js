@@ -1,25 +1,25 @@
 import https from "http";
 import http from "http";
-import fs from "fs/promises";
-import fsSync from "fs"
+import { readFile, writeFile, appendFile } from "fs/promises";
+import fs from "fs"
 
 const httpsport = 443;
 const httpport = 80;
 
 
 const keys = {
-  key: fsSync.readFileSync("./certs/privkey.pem"),
-  cert: fsSync.readFileSync("./certs/fullchain.pem"),
+  key: fs.readFileSync("certs/privkey.pem"),
+  cert: fs.readFileSync("certs/fullchain.pem"),
 };
 
 const httpsServer = https.createServer(keys, async (req, res) => {
   try {
     logRequestDetails(req, res);
     if (req.method === "GET" && req.url === "/logs") {
-      const data = await fs.readFile("logs.txt");
+      const data = await readFile("logs.txt");
       return res.end(data.toString());
     }
-    res.end("hi");
+    res.end("hi from https");
   } catch (error) {
     console.log(error);
     res.statusCode = 500;
@@ -32,10 +32,10 @@ const httpServer = http.createServer(keys, async (req, res) => {
   try {
     logRequestDetails(req, res);
     if (req.method === "GET" && req.url === "/logs") {
-      const data = await fs.readFile("logs.txt");
+      const data = await readFile("logs.txt");
       return res.end(data.toString());
     }
-    res.end("hi");
+    res.end("hi from http");
   } catch (error) {
     console.log(error);
     res.statusCode = 500;
@@ -53,7 +53,7 @@ async function logRequestDetails(req, res) {
     const { method, url } = req;
 
     const log = `IP: ${remoteAddress}\nUser Agent: ${userAgent}\nDate/Time: ${dateTime}\nMethod: ${method}\nUrl: ${url}\n\n`;
-    await fs.appendFile("logs.txt", log);
+    await appendFile("logs.txt", log);
   } catch (error) {
     console.log(error);
     res.statusCode = 500;
@@ -63,12 +63,11 @@ async function logRequestDetails(req, res) {
 }
 
 
-httpServer.listen(httpport, async () => {
+httpServer.listen(httpport, () => {
   console.log(`Server running at ${httpport}`);
 });
 
 
-
-httpsServer.listen(httpsport, async () => {
+httpsServer.listen(httpsport, () => {
   console.log(`Server running at ${httpsport}`);
 });

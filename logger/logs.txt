@@ -1,1 +1,37 @@
 
+IP: ::1
+User Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+Date/Time: 2024-05-17T02:47:19.077Z
+Method: GET
+Url: /
+
+IP: ::1
+User Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+Date/Time: 2024-05-17T02:47:19.489Z
+Method: GET
+Url: /favicon.ico
+
+IP: ::1
+User Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+Date/Time: 2024-05-17T02:47:25.442Z
+Method: GET
+Url: /
+
+IP: ::1
+User Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+Date/Time: 2024-05-17T02:47:25.570Z
+Method: GET
+Url: /favicon.ico
+
+IP: ::1
+User Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+Date/Time: 2024-05-17T02:47:34.392Z
+Method: GET
+Url: /logs
+
+IP: ::1
+User Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+Date/Time: 2024-05-17T02:47:34.469Z
+Method: GET
+Url: /favicon.ico
+
