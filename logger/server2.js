@@ -1,73 +1,71 @@
-import https from "http";
-import http from "http";
-import { readFile, writeFile, appendFile } from "fs/promises";
-import fs from "fs"
+import { readFile, writeFile } from 'fs/promises';
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
+import url from 'url';
 
-const httpsport = 443;
-const httpport = 80;
+const httpPort = 80;
+const httpsPort = 443;
 
-
-const keys = {
-  key: fs.readFileSync("certs/privkey.pem"),
-  cert: fs.readFileSync("certs/fullchain.pem"),
-};
-
-const httpsServer = https.createServer(keys, async (req, res) => {
-  try {
-    logRequestDetails(req, res);
-    if (req.method === "GET" && req.url === "/logs") {
-      const data = await readFile("logs.txt");
-      return res.end(data.toString());
-    }
-    res.end("hi from https");
-  } catch (error) {
-    console.log(error);
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "application/json");
-    res.end({ error: "internal server error" });
-  }
+const httpServer = http.createServer((req, res) => {
+  const httpsUrl = `https://${req.headers.host}${req.url}`;
+  res.writeHead(301, { Location: httpsUrl });
+  res.end();
 });
 
-const httpServer = http.createServer(keys, async (req, res) => {
-  try {
-    logRequestDetails(req, res);
-    if (req.method === "GET" && req.url === "/logs") {
-      const data = await readFile("logs.txt");
-      return res.end(data.toString());
+const httpsServer = https.createServer(
+  {
+    key: fs.readFileSync('certs/privkey.pem'),
+    cert: fs.readFileSync('certs/fullchain.pem')
+  }, async (req, res) => {
+    await logRequestDetails(req, res);
+
+    const parsedUrl = url.parse(req.url, true);
+
+    if (req.method == 'GET' && parsedUrl.path == '/logs') {
+      try {
+        let logsData = await readFile('logs.txt');
+        logsData = logsData.toString();
+
+        res.statusCode = 200;
+        res.setHeader('content-type', 'text')
+        res.end(logsData);
+      } catch (error) {
+        console.log(error);
+        res.statusCode = 500;
+        res.end('Internal Server Error');
+      }
+    } else {
+      res.statusCode = 404;
+      res.end('Not found');
     }
-    res.end("hi from http");
-  } catch (error) {
-    console.log(error);
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "application/json");
-    res.end({ error: "internal server error" });
-  }
+  });
+
+httpServer.listen(httpPort, () => {
+  console.log(`Server is running at ${httpPort}`);
 });
+
+httpsServer.listen(httpsPort, () => {
+  console.log(`Server is running at ${httpsPort}`);
+})
 
 
 async function logRequestDetails(req, res) {
-  try {
-    const remoteAddress = req.socket.remoteAddress;
-    const userAgent = req.headers["user-agent"];
-    const dateTime = new Date().toISOString();
-    const { method, url } = req;
+  const remoteAddress = req.socket.remoteAddress;
+  const userAgent = req.headers['user-agent'];
+  const method = req.method;
+  const dateTime = new Date().toISOString();
+  const url = req.url;
 
-    const log = `IP: ${remoteAddress}\nUser Agent: ${userAgent}\nDate/Time: ${dateTime}\nMethod: ${method}\nUrl: ${url}\n\n`;
-    await appendFile("logs.txt", log);
+  let log = [remoteAddress, userAgent, method, dateTime, url].join(' ');
+
+  try {
+    let logsData = await readFile('logs.txt');
+    logsData = logsData.toString();
+
+    logsData += '\n' + log;
+    await writeFile('logs.txt', logsData);
   } catch (error) {
-    console.log(error);
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "application/json");
-    res.end({ error: "internal server error" });
+    throw error;
   }
 }
-
-
-httpServer.listen(httpport, () => {
-  console.log(`Server running at ${httpport}`);
-});
-
-
-httpsServer.listen(httpsport, () => {
-  console.log(`Server running at ${httpsport}`);
-});
